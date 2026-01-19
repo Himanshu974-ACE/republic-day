@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>77th Republic Day | 2026 Grand Tribute</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@200;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --saffron: #FF9933;
+            --white: #FFFFFF;
+            --green: #138808;
+            --navy: #000080;
+            --gold: #D4AF37;
+            --dark-gold: #1a1605;
+            --deep-bronze: #0a0904;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+            background: #020205;
+            color: #fff;
+            cursor: none;
+            overflow-x: hidden;
+        }
+
+        .serif-title { font-family: 'Cinzel', serif; }
+        .accent-font { font-family: 'Playfair Display', serif; }
+
+        /* Custom Cursor Trail */
+        #cursor-dot {
+            width: 8px; height: 8px; background: var(--saffron);
+            position: fixed; pointer-events: none; z-index: 9999; border-radius: 50%;
+        }
+        #cursor-outline {
+            width: 40px; height: 40px; border: 2px solid var(--gold);
+            position: fixed; pointer-events: none; z-index: 9998; border-radius: 50%;
+            transition: transform 0.15s ease-out;
+        }
+
+        /* Cinematic Waving Flag Background */
+        .flag-hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.12; overflow: hidden; pointer-events: none;
+        }
+
+        .flag-wave {
+            width: 200%; height: 100%;
+            background: linear-gradient(to bottom, var(--saffron) 33.3%, var(--white) 33.3%, var(--white) 66.6%, var(--green) 66.6%);
+            position: absolute; top: 0; left: -50%;
+            animation: move-flag 12s linear infinite, ripple 4s ease-in-out infinite alternate;
+            filter: blur(3px);
+        }
+
+        @keyframes move-flag { 0% { transform: translateX(0); } 100% { transform: translateX(25%); } }
+        @keyframes ripple {
+            0% { clip-path: polygon(0% 15%, 15% 10%, 30% 15%, 45% 10%, 60% 15%, 75% 10%, 90% 15%, 100% 10%, 100% 100%, 0% 100%); }
+            100% { clip-path: polygon(0% 10%, 15% 15%, 30% 10%, 45% 15%, 60% 10%, 75% 15%, 90% 10%, 100% 15%, 100% 100%, 0% 100%); }
+        }
+
+        /* 3D Map Container */
+        #map-container { width: 100%; height: 500px; position: relative; z-index: 5; }
+
+        /* Specialized 3D Containers */
+        #chakra-3d-container { height: 320px; width: 100%; }
+        #flame-3d-container { height: 250px; width: 100%; }
+        #compass-3d-container { height: 280px; width: 280px; margin: 0 auto; position: relative; }
+
+        .golden-transition { background: linear-gradient(to bottom, #020205 0%, var(--deep-bronze) 100%); }
+        .golden-section { background: var(--deep-bronze); position: relative; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .gold-glass-card {
+            background: rgba(26, 22, 5, 0.4);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .gold-glass-card:hover {
+            background: rgba(212, 175, 55, 0.08);
+            border-color: var(--gold);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+
+        .gold-text {
+            color: transparent;
+         background: linear-gradient(135deg, #FFD700 0%, #B8860B 50%, #FFD700 100%);
+          background-clip: text;            /* Standard */
+          -webkit-background-clip: text;    /* Chrome, Safari */
+         -webkit-text-fill-color: transparent;
+        }
+
+        
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .attribute-tag {
+            padding: 10px 22px; border-radius: 40px; font-size: 11px; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.4s ease; cursor: pointer; background: rgba(212, 175, 55, 0.05); color: var(--gold);
+        }
+        .attribute-tag:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px rgba(212, 175, 55, 0.4); }
+
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 1.2s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        #confetti-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 10000; }
+        .chakra-pulse-logo { animation: rotate-logo 25s linear infinite; }
+        @keyframes rotate-logo { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="cursor-dot"></div>
+    <div id="cursor-outline"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 px-6 py-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center glass-card px-8 py-3 rounded-full">
+            <div class="flex items-center space-x-3">
+                <svg class="w-8 h-8 chakra-pulse-logo" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--navy)" stroke-width="2"/>
+                    <circle cx="50" cy="50" r="8" fill="var(--navy)"/>
+                    <g stroke="var(--navy)" stroke-width="1.5">
+                        <line x1="50" y1="5" x2="50" y2="95" /><line x1="5" y1="50" x2="95" y2="50" />
+                        <line x1="18" y1="18" x2="82" y2="82" /><line x1="82" y1="18" x2="18" y2="82" />
+                    </g>
+                </svg>
+                <span class="serif-title text-xl gold-text font-bold uppercase tracking-widest">Republic 2026</span>
+            </div>
+            <div class="hidden md:flex space-x-10 text-[10px] tracking-[0.3em] font-bold uppercase">
+                <a href="#home" class="hover:text-orange-400 transition">Nation</a>
+                <a href="#tribute" class="hover:text-orange-400 transition">Tribute</a>
+                <a href="#ceremony" class="hover:text-orange-400 transition">Ceremony</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex flex-col items-center justify-center relative pt-32 overflow-hidden golden-transition">
+        <div class="flag-hero-bg">
+            <div class="flag-wave"></div>
+        </div>
+        <div class="container mx-auto px-6 text-center z-10">
+            <div class="inline-block px-4 py-1 mb-6 border border-white/20 rounded-full text-[10px] tracking-[0.5em] uppercase font-bold text-white/60 bg-black/40 backdrop-blur-sm">
+                77 Years of Sovereignty
+            </div>
+            <h1 class="serif-title text-5xl md:text-9xl mb-4 tracking-tighter leading-tight drop-shadow-2xl">
+                The Soul of <br>
+                <span class="accent-font italic font-normal text-saffron">Our Republic</span>
+            </h1>
+        </div>
+        <div id="map-container"></div>
+        <div class="container mx-auto px-6 text-center z-10 -mt-20 pb-10">
+            <p class="max-w-2xl mx-auto text-white/50 font-light text-lg mb-10 tracking-wide leading-relaxed">
+                Celebrating the dawn of 2026. A tribute to the mentors who ignite the light of wisdom across our great nation.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <button onclick="salute()" class="px-14 py-5 bg-white text-black font-bold rounded-full hover:bg-orange-500 hover:text-white transition-all uppercase tracking-widest text-xs transform hover:scale-105">
+                    Digital Salute
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tribute Section -->
+    <section id="tribute" class="py-32 relative golden-section">
+        <div class="container mx-auto px-6">
+            <div class="grid lg:grid-cols-12 gap-16 items-center">
+                <div class="lg:col-span-7 reveal">
+                    <div class="gold-glass-card p-12 md:p-20 rounded-[80px] relative border-l-4 border-l-orange-500 overflow-hidden shadow-2xl">
+                        <h3 class="serif-title text-4xl mb-10 gold-text uppercase tracking-widest">To My Mentor</h3>
+                        <div class="min-h-[220px]">
+                            <p id="typing-text" class="text-2xl md:text-3xl text-white/90 leading-relaxed font-light accent-font italic">
+                                To the mentors who sculpt our souls and the educators who ignite our minds—you are the silent architects of our great Republic. On this 77th Republic Day, we salute your dedication to truth and knowledge. You don't just teach us history; you help us write the future of a sovereign India. Your guidance is the compass that leads us through the journey of life.
+                            </p>
+                        </div>
+                        <div class="mt-16 flex flex-wrap gap-4">
+                            <span class="attribute-tag" onclick="salute()">Wisdom</span>
+                            <span class="attribute-tag" onclick="salute()">Patience</span>
+                            <span class="attribute-tag" onclick="salute()">Guidance</span>
+                        </div>
+                        <div class="mt-16 pt-10 border-t border-gold/10 flex items-center gap-8">
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-orange-500 via-gold to-green-500 shadow-xl border border-gold/20"></div>
+                            <div>
+                                <p class="font-bold text-white uppercase tracking-widest text-lg">Jai Hind, Teacher!</p>
+                                <p class="text-[11px] text-gold/40 uppercase tracking-[0.4em]">From Himanshu Saini | Your lovely student</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-5 grid grid-cols-2 gap-8 reveal" style="transition-delay: 0.4s;">
+                    <div class="col-span-2 gold-glass-card rounded-[50px] overflow-hidden flex flex-col items-center justify-center p-8">
+                        <div id="chakra-3d-container"></div>
+                        <div class="text-center px-4">
+                            <p class="text-[10px] uppercase tracking-[0.4em] text-gold mt-4 font-bold">The Wheel of Duty</p>
+                            <p class="text-[11px] text-white/60 mt-2 font-light italic leading-relaxed">
+                                The Dharma Chakra denotes the constant motion of progress and the 24 hours of selfless service to the nation. It symbolizes that life is in movement, and India must move forward toward excellence.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Virtual Ritual -->
+    <section id="ceremony" class="py-32 golden-section text-center">
+        <div class="container mx-auto px-6">
+            <h2 class="serif-title text-4xl mb-16 gold-text uppercase tracking-[0.3em]">The Flame of Knowledge</h2>
+            <div class="max-w-lg mx-auto gold-glass-card p-16 rounded-[60px] cursor-pointer group hover:border-gold/50 transition-all" onclick="ignite()">
+                <div id="flame-3d-container"></div>
+                <div class="w-56 h-20 bg-gold/5 border border-gold/20 rounded-full mx-auto mt-6 flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gold/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span id="label" class="text-xs uppercase tracking-[0.5em] text-gold group-hover:text-white transition-all relative z-10">Ignite the Wisdom</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preamble Section with 3D Compass -->
+    <section class="py-32 golden-section overflow-hidden">
+        <div class="container mx-auto px-6 text-center">
+            <div id="compass-3d-container" class="mb-4"></div>
+            <div class="mb-12 max-w-lg mx-auto">
+                <p class="text-[10px] uppercase tracking-[0.4em] text-gold font-bold">The Golden Compass</p>
+                <p class="text-[11px] text-white/50 mt-3 font-light italic leading-relaxed">
+                    A compass does not just show the way; it ensures we stay true to our moral north. This denotes the integrity and values you instill in us, guiding the Republic toward a future of Justice and Liberty.
+                </p>
+            </div>
+            <div class="reveal max-w-2xl w-full mx-auto bg-[#fff9f0] p-16 md:p-24 rounded-sm border border-orange-900/10 shadow-2xl text-orange-900">
+                <div class="text-center">
+                    <h3 class="serif-title text-2xl font-bold mb-8 uppercase tracking-widest">Our Shared Promise</h3>
+                    <p class="leading-loose accent-font italic text-lg mb-8 opacity-90">
+                        "Our Republic is a simple promise we make to each other. It is the belief that every Indian is equal, every voice matters, and we all have the freedom to dream and grow together. Like one big family, we are bound by our love for this land and our respect for the values that keep us united."
+                    </p>
+                    <div class="flex justify-center gap-2 items-center text-[10px] font-bold opacity-40 uppercase tracking-[0.3em]">
+                        <span>Equality</span> · <span>Unity</span> · <span>Freedom</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-24 text-center border-t border-gold/10 bg-[#0a0904]">
+        <div class="container mx-auto px-6">
+            <p class="serif-title text-3xl gold-text mb-4 tracking-[0.1em] font-bold uppercase">Happy Republic Day to my teacher</p>
+            <p class="text-white font-medium tracking-[0.2em] mb-4 uppercase">by Himanshu Saini | Your lovely student</p>
+            <div class="flex justify-center items-center space-x-6 mb-8 opacity-30">
+                <div class="w-16 h-[1px] bg-orange-500"></div>
+                <span class="text-[10px] uppercase tracking-[1em]">Jai Hind</span>
+                <div class="w-16 h-[1px] bg-green-500"></div>
+            </div>
+            <p class="text-[9px] uppercase tracking-[0.7em] text-gold/20">A Golden Tribute | 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // Custom Cursor
+        const dot = document.getElementById('cursor-dot');
+        const outline = document.getElementById('cursor-outline');
+        window.addEventListener('mousemove', (e) => {
+            dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+            setTimeout(() => {
+                outline.style.left = e.clientX - 16 + 'px';
+                outline.style.top = e.clientY - 16 + 'px';
+            }, 60);
+        });
+
+        // --- Three.js Scenes ---
+        let scenes = { map: null, chakra: null, flame: null, compass: null };
+        let renderers = { map: null, chakra: null, flame: null, compass: null };
+        let groups = { map: null, chakra: null, flame: null, compass: null };
+
+        const isMobile = window.innerWidth < 768;
+        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+        const isDesktop = window.innerWidth >= 1024;
+
+
+        let MAP_PARTICLES = 3000;
+        let FLAME_PARTICLES = 400;
+
+        if (window.innerWidth < 768) {
+        MAP_PARTICLES = 1200;
+        FLAME_PARTICLES = 180;
+        }
+ 
+        if ('ontouchstart' in window) {
+        document.getElementById('cursor-dot').style.display = 'none';
+        document.getElementById('cursor-outline').style.display = 'none';
+        document.body.style.cursor = 'auto';
+        }
+
+        function initMap() {
+            const container = document.getElementById('map-container');
+            if (!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.offsetWidth / (container.offsetHeight || 500), 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight || 500);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BufferGeometry();
+            const count = 3000;
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                let x = (Math.random() - 0.5) * 4.5;
+                let y = (Math.random() - 0.5) * 5.5;
+                let z = (Math.random() - 0.5) * 2;
+                if (Math.abs(x) > (2.2 - y * 0.4) || y < -2.5 || y > 2.5) { i--; continue; }
+                positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+                if (y > 0.8) { colors[i*3] = 1; colors[i*3+1] = 0.6; colors[i*3+2] = 0.2; }
+                else if (y < -0.8) { colors[i*3] = 0.07; colors[i*3+1] = 0.53; colors[i*3+2] = 0.03; }
+                else { colors[i*3] = 1; colors[i*3+1] = 1; colors[i*3+2] = 0.8; }
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            const material = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+            groups.map = new THREE.Points(geometry, material);
+            scene.add(groups.map);
+            camera.position.z = 6;
+            scenes.map = scene; renderers.map = renderer; scene.userData.cam = camera;
+        }
+
+        function initChakra() {
+            const container = document.getElementById('chakra-3d-container');
+            if (!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, container.offsetWidth / (container.offsetHeight || 300), 0.1, 100);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight || 300);
+            container.appendChild(renderer.domElement);
+
+            const group = new THREE.Group();
+            const ringGeo = new THREE.TorusGeometry(2, 0.03, 16, 100);
+            const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true }));
+            group.add(ring);
+            const blueMat = new THREE.MeshBasicMaterial({ color: 0x000080, transparent: true, opacity: 0.5 });
+            group.add(new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), blueMat));
+            for (let i = 0; i < 24; i++) {
+                const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.01, 1.95, 0.01), new THREE.MeshBasicMaterial({ color: 0xD4AF37 }));
+                spoke.rotation.z = (i * (Math.PI / 12));
+                group.add(spoke);
+            }
+            scene.add(group);
+            camera.position.z = 6;
+            scenes.chakra = scene; renderers.chakra = renderer; groups.chakra = group; scene.userData.cam = camera;
+        }
+
+        function initFlame() {
+            const container = document.getElementById('flame-3d-container');
+            if (!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, container.offsetWidth / (container.offsetHeight || 250), 0.1, 100);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight || 250);
+            container.appendChild(renderer.domElement);
+
+            const count = 400;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                pos[i*3] = (Math.random() - 0.5) * 0.4;
+                pos[i*3+1] = Math.random() * 2;
+                pos[i*3+2] = (Math.random() - 0.5) * 0.4;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const material = new THREE.PointsMaterial({ color: 0xFF9933, size: 0.06, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+            const flame = new THREE.Points(geo, material);
+            scene.add(flame);
+            camera.position.z = 5; camera.position.y = 1;
+            scenes.flame = scene; renderers.flame = renderer; groups.flame = flame; scene.userData.cam = camera;
+        }
+
+        function initCompass() {
+            const container = document.getElementById('compass-3d-container');
+            if (!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(280, 280);
+            container.appendChild(renderer.domElement);
+
+            const group = new THREE.Group();
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.05, 16, 100), new THREE.MeshBasicMaterial({ color: 0xD4AF37 }));
+            ring.rotation.x = Math.PI / 2;
+            group.add(ring);
+            
+            const needleNorth = new THREE.Mesh(new THREE.ConeGeometry(0.15, 1.4, 4), new THREE.MeshBasicMaterial({ color: 0xFF9933 }));
+            needleNorth.position.y = 0.7;
+            const needleSouth = new THREE.Mesh(new THREE.ConeGeometry(0.15, 1.4, 4), new THREE.MeshBasicMaterial({ color: 0x138808 }));
+            needleSouth.rotation.x = Math.PI; needleSouth.position.y = -0.7;
+            const pivot = new THREE.Group(); pivot.add(needleNorth); pivot.add(needleSouth);
+            pivot.rotation.x = Math.PI/2;
+            group.add(pivot);
+
+            scene.add(group);
+            camera.position.z = 6;
+            scenes.compass = scene; renderers.compass = renderer; groups.compass = group; scene.userData.cam = camera;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = Date.now() * 0.001;
+
+            if (renderers.map && scenes.map) {
+                groups.map.rotation.y += 0.003;
+                renderers.map.render(scenes.map, scenes.map.userData.cam);
+            }
+            if (renderers.chakra && scenes.chakra) {
+                groups.chakra.rotation.y += 0.012;
+                groups.chakra.children[1].material.opacity = 0.3 + Math.sin(t * 3) * 0.2;
+                renderers.chakra.render(scenes.chakra, scenes.chakra.userData.cam);
+            }
+            if (renderers.flame && scenes.flame) {
+                const p = groups.flame.geometry.attributes.position.array;
+                for (let i = 0; i < p.length/3; i++) {
+                    p[i*3+1] += 0.015;
+                    if (p[i*3+1] > 2) p[i*3+1] = 0;
+                }
+                groups.flame.geometry.attributes.position.needsUpdate = true;
+                groups.flame.scale.setScalar(1 + Math.sin(t * 4) * 0.04);
+                renderers.flame.render(scenes.flame, scenes.flame.userData.cam);
+            }
+            if (renderers.compass && scenes.compass) {
+                groups.compass.rotation.y += 0.006;
+                groups.compass.rotation.x = Math.sin(t) * 0.15;
+                renderers.compass.render(scenes.compass, scenes.compass.userData.cam);
+            }
+        }
+
+        // --- Interaction Logic ---
+        const message = "To the mentors who sculpt our souls and the educators who ignite our minds—you are the silent architects of our great Republic. On this 77th Republic Day, we salute your dedication to truth and knowledge. You don't just teach us history; you help us write the future of a sovereign India. Your guidance is the compass that leads us through the journey of life.";
+        let charIdx = 0;
+        let typingStarted = false;
+
+        function typeText() {
+            if (charIdx === 0) {
+                document.getElementById('typing-text').innerHTML = ""; // Clear fallback on start
+            }
+            if (charIdx < message.length) {
+                document.getElementById('typing-text').innerHTML += message.charAt(charIdx++);
+                setTimeout(typeText, 35);
+            }
+        }
+
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const cCtx = confettiCanvas.getContext('2d');
+        let confettis = [];
+        function salute() {
+            for(let i=0; i<200; i++) {
+                confettis.push({
+                    x: window.innerWidth/2, y: window.innerHeight+10,
+                    size: Math.random()*8+4, sx: Math.random()*12-6, sy: Math.random()*-22-8,
+                    c: ['#FF9933', '#D4AF37', '#138808', '#FFFFFF'][Math.floor(Math.random()*4)],
+                    r: Math.random()*360, l: 1
+                });
+            }
+            if(!confettiLooping) loopConfetti();
+        }
+
+        let confettiLooping = false;
+        function loopConfetti() {
+            confettiLooping = true;
+            cCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+            confettis = confettis.filter(p => p.l > 0);
+            confettis.forEach(p => {
+                p.sy += 0.42; p.x += p.sx; p.y += p.sy; p.l -= 0.007; p.r += 10;
+                cCtx.save(); cCtx.translate(p.x, p.y); cCtx.rotate(p.r*Math.PI/180);
+                cCtx.fillStyle = p.c; cCtx.globalAlpha = p.l;
+                cCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size); cCtx.restore();
+            });
+            if(confettis.length > 0) requestAnimationFrame(loopConfetti);
+            else confettiLooping = false;
+        }
+
+        function ignite() {
+            document.getElementById('label').innerText = 'Knowledge Flame is Eternal';
+            salute();
+        }
+
+        window.onload = () => {
+            initMap(); initChakra(); initFlame(); initCompass();
+            animate();
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if(e.isIntersecting) {
+                        e.target.classList.add('active');
+                        if (e.target.id === 'tribute' && !typingStarted) {
+                            typingStarted = true;
+                            typeText();
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        };
+    </script>
+</body>
+</html>
